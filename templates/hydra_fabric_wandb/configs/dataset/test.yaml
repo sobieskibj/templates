@@ -1,0 +1,4 @@
+_target_: torch.utils.data.DataLoader
+dataset:
+  _target_: dataset.TestDataset
+batch_size: 1

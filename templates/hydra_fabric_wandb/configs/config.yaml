@@ -1,0 +1,18 @@
+defaults:
+  - _self_
+  - network: test
+  - dataset: test
+
+exp:
+  seed: 42
+  log_dir: # set during runtime to automatically created dir
+  run_func: 
+    _target_: experiment.run_test
+
+fabric:
+  _target_: lightning.Fabric
+  num_nodes: 1
+  devices: 1
+
+wandb:
+  project: test_project
