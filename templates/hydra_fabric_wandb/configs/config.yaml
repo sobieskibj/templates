@@ -4,6 +4,7 @@ defaults:
   - dataloader: test
   - wandb: default
   - metric: all_test
+  - hydra: default
   - fabric: default
 
 exp:

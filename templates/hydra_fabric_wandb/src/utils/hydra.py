@@ -1,13 +1,14 @@
-import hydra
+import logging
 from pathlib import Path
 
-import logging
+import hydra
+
 log = logging.getLogger(__name__)
 
 
 def preprocess_config(config):
-    '''Sets config.exp.log_dir to logging directory and symlinks it to CWD.'''
-    
+    """Sets config.exp.log_dir to logging directory and symlinks it to CWD."""
+
     # get logging directory
     log_dir = Path(hydra.core.hydra_config.HydraConfig.get().runtime.output_dir)
 
