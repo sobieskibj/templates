@@ -1,2 +1,1 @@
-from .hydra import *
-from .wandb import *
+from . import hydra, wandb

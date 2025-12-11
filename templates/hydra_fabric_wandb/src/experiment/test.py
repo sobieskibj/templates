@@ -1,12 +1,11 @@
-
-import torch
-from omegaconf import DictConfig
-from hydra.utils import instantiate
+import logging
 
 import utils
+from hydra.utils import instantiate
+from omegaconf import DictConfig
 
-import logging
 log = logging.getLogger(__name__)
+
 
 def get_fabric(config):
     fabric = instantiate(config.fabric)
@@ -14,26 +13,37 @@ def get_fabric(config):
     fabric.launch()
     return fabric
 
+
 def get_components(config, fabric):
     network = fabric.setup(instantiate(config.network))
-    return network
+    # init metrics
+    metrics = [fabric.setup(instantiate(m)) for m in config.metric.values()]
+    return network, metrics
+
 
 def get_dataloader(config, fabric):
-    return fabric.setup_dataloaders(instantiate(config.dataset))
+    return fabric.setup_dataloaders(instantiate(config.dataloader))
+
 
 def run(config: DictConfig):
-    utils.preprocess_config(config)
-    utils.setup_wandb(config)
+    utils.hydra.preprocess_config(config)
+    utils.wandb.setup_wandb(config)
 
-    log.info(f'Launching Fabric')
+    log.info("Launching Fabric")
     fabric = get_fabric(config)
 
-    log.info(f'Building components')
-    network = get_components(config, fabric)
+    log.info("Building components")
+    network, metrics = get_components(config, fabric)
 
-    log.info(f'Initializing dataloader')
+    log.info("Initializing dataloader")
     dataloader = get_dataloader(config, fabric)
 
     with fabric.init_tensor():
         for batch_idx, batch in enumerate(dataloader):
             network.action()
+
+            for metric in metrics:
+                metric(batch_idx, batch)
+
+        for metric in metrics:
+            metric.compute_and_log()

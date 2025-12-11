@@ -1,0 +1,3 @@
+_target_: lightning.Fabric
+num_nodes: 1
+devices: 1

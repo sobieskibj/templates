@@ -1,0 +1,4 @@
+_partial_: true
+_target_: wandb.init
+project: test_project
+sync_tensorboard: true

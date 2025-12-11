@@ -1,0 +1,22 @@
+# .github/workflows/ruff-format-check.yml
+name: Ruff Format Check
+
+# This workflow will run on pull requests to the main branch and on pushes to main
+on:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  ruff-format-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    # Checkout the repository code
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    # Run Ruff format check specifically on the ./src directory
+    - name: Check formatting with Ruff
+      uses: astral-sh/ruff-action@v3
+      with:
+        args: "format --check ./src"
