@@ -1,4 +1,5 @@
 import logging
+import os
 from pathlib import Path
 
 import hydra
@@ -25,6 +26,10 @@ def preprocess_config(config):
 
         except FileExistsError:
             log.info("Attempting to symlink to existing directory.")
+
+    # print variants
+    log.info(f"DATA_VARIANT={os.getenv('DATA_VARIANT')}")
+    log.info(f"METHOD_VARIANT={os.getenv('METHOD_VARIANT')}")
 
     # save in config
     config.exp.log_dir = log_dir

@@ -1,8 +1,8 @@
 defaults:
   - _self_
-  - network: test
-  - dataloader: test
-  - wandb: default
+  - network: ${oc.env:DATA_VARIANT}/${oc.env:METHOD_VARIANT}/default # environmental variables can be used to parameterize configs
+  - dataloader: ${oc.env:DATA_VARIANT}
+  - logger: wandb/default
   - metric: all_test
   - hydra: default
   - fabric: default

@@ -1,0 +1,12 @@
+_partial_: true
+_target_: logger.wandb.WandBLogger
+project: ???
+sync_tensorboard: true
+log_images: true
+exclude_images: []
+log_data: true
+exclude_data: []
+log_metrics: true
+exclude_metrics: []
+log_metadata: true
+exclude_metadata: []
