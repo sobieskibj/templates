@@ -1,9 +1,12 @@
 import csv
+import io
 import logging
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import torch
 import wandb
+from PIL import Image
 from torchvision.utils import make_grid
 
 from utils.helpers import min_max_scale
@@ -43,21 +46,37 @@ class WandBLogger(BaseLogger):
         self.exclude_metadata = exclude_metadata
 
     def _log_images(self, log_dict):
-        # exclude keys from self.exclude_images
+        # exclude keys from self.exclude_images (Logic untouched)
         images_dict = {
             k: v
             for k, v in log_dict.items()
             if not any([k in e for e in self.exclude_images])
         }
-        # extract image entries
+
+        # extract image entries (Key transformation logic untouched)
         images_dict = {
-            k.replace("images/", "", 1): wandb.Image(make_grid(min_max_scale(v)))
+            k.replace("images/", "", 1): self._process_visual_value(v)
             for k, v in images_dict.items()
             if k.startswith("images/")
         }
+
         if len(images_dict) > 0:
             # log to wandb
             wandb.log(images_dict)
+
+    def _process_visual_value(self, v):
+        """Helper to branch between scatter plots and image grids."""
+        # Check for 2D Coordinate Case (Batch, 2)
+        if v.ndim == 2 and v.shape[-1] == 2:
+            return wandb.Image(self._create_scatter_plot(v))
+
+        # Default to standard Image Case (Batch, C, H, W)
+        return wandb.Image(make_grid(min_max_scale(v), pad_value=1.0))
+
+    def _create_scatter_plot(self, coords):
+        """TODO: scatter plot logic"""
+        img = ...
+        return img
 
     def _log_data(self, log_dict):
         # exclude keys from self.exclude_data
@@ -113,20 +132,17 @@ class WandBLogger(BaseLogger):
         for filepath, value in metadata_dict.items():
             filepath.parent.mkdir(parents=True, exist_ok=True)
 
-            # 1. Handle Tensor conversion
-            if isinstance(value, torch.Tensor):
-                value = value.numpy(force=True)
-
             # 2. Open file
             with open(filepath, "a", newline="") as f:
                 writer = csv.writer(f)
 
-                # 3. Handle shapes (Scalar vs Batch)
-                if hasattr(value, "ndim") and value.ndim > 0:
-                    # Case: (32, 2) Tensor/Array -> Write 32 rows with 2 cols each
-                    writer.writerows(value)
+                if hasattr(value, "ndim") and value.ndim == 1:
+                    # It's just one line of data, so use the singular 'writerow'
+                    writer.writerow(value.numpy(force=True))
+                elif hasattr(value, "ndim") and value.ndim > 1:
+                    # It's a full table, use 'writerows'
+                    writer.writerows(value.numpy(force=True))
                 else:
-                    # Case: Scalar (float/int) -> Wrap in list to write 1 row
                     writer.writerow([value])
 
     def log(self, log_dict):

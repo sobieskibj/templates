@@ -40,10 +40,13 @@ def run(config: DictConfig):
 
     with fabric.init_tensor():
         for batch_idx, batch in enumerate(dataloader):
-            network.action()
+            
+            log_dict = ...
 
             for metric in metrics:
-                metric(batch_idx, batch)
+                metric(log_dict)
+
+            logger.log(log_dict)
 
         for metric in metrics:
-            metric.compute_and_log()
+            metric.compute_and_log(fabric, logger)
