@@ -1,0 +1,24 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# VSCode
+.vscode
+
+# Virtual environments
+.venv
+
+# Remove lock file for multiplatform setup
+uv.lock
+
+# Project specific stuff 
+.envrc
+**/outputs
+
+# MLFlow
+*.db
+mlruns/

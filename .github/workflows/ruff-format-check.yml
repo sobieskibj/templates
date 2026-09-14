@@ -1,7 +1,7 @@
 # .github/workflows/ruff-format-check.yml
 name: Ruff Format Check
 
-# This workflow will run on pull requests to the main branch and on pushes to main
+# This workflow checks the ruff formatting of every template on pull requests to master
 on:
   pull_request:
     branches: [ master ]
@@ -15,8 +15,9 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
     
-    # Run Ruff format check specifically on the ./src directory
+    # Run Ruff format check on all templates (each template's own pyproject.toml
+    # configures ruff for the files underneath it)
     - name: Check formatting with Ruff
       uses: astral-sh/ruff-action@v3
       with:
-        args: "format --check ./src"
+        args: "format --check templates/"
